@@ -1,115 +1,112 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "name": {
-      "type": "string"
-    },
-    "username": {
-      "type": "string",
-      "defaultValue": "sonar"
-    },
-    "password": {
-      "type": "securestring"
-    },
-    "startIP": {
-      "type": "string",
-      "defaultValue": "0.0.0.0"
-    },
-    "endIP": {
-      "type": "string",
-      "defaultValue": "0.0.0.0"
-    },
-    "databaseEdition": {
-      "type": "string",
-      "defaultValue": "Standard",
-      "allowedValues": [
-        "Basic",
-        "Standard",
-        "Premium"
-      ],
-      "metadata": {
-        "description": "The type of database to create."
-      }
-    },
-    "databaseRequestedServiceObjectiveName": {
-      "type": "string",
-      "defaultValue": "S0",
-      "allowedValues": [
-        "Basic",
-        "S0",
-        "S1",
-        "S2",
-        "P1",
-        "P2",
-        "P3"c
-      ],
-      "metadata": {
-        "description": "Describes the performance level for Edition"
-      }
-    }
-  },
-  "variables": {
-    "serverName": "[toLower(parameters('name'))]",
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"name": {
+			"type": "string"
+		},
+		"username": {
+			"type": "string",
+			"defaultValue": "sonar"
+		},
+		"password": {
+			"type": "securestring"
+		},
+		"startIP": {
+			"type": "string",
+			"defaultValue": "0.0.0.0"
+		},
+		"endIP": {
+			"type": "string",
+			"defaultValue": "0.0.0.0"
+		},
+		"databaseEdition": {
+			"type": "string",
+			"defaultValue": "Standard",
+			"allowedValues": [
+				"Basic",
+				"Standard",
+				"Premium"
+			],
+			"metadata": {
+				"description": "The type of database to create."
+			}
+		},
+		"databaseRequestedServiceObjectiveName": {
+			"type": "string",
+			"defaultValue": "S0",
+			"allowedValues": [
+				"Basic",
+				"S0",
+				"S1",
+				"S2",
+				"P1",
+				"P2",
+				"P3"
+			],
+			"metadata": {
+				"description": "Describes the performance level for Edition"
+			}
+		}
+	},
+	"variables": {
+		"serverName": "[toLower(parameters('name'))]",
 
-    "databaseName": "sonar",
-    "databaseCollation": "SQL_Latin1_General_CP1_CS_AS",
-    "databasemaxSizeBytes": "1073741824"      
+		"databaseName": "sonar",
+		"databaseCollation": "SQL_Latin1_General_CP1_CS_AS",
+		"databasemaxSizeBytes": "1073741824"
 
-  },
-  "resources": [
-    {
-      "name": "[variables('serverName')]",
-      "type": "Microsoft.Sql/servers",
-      "apiVersion": "2014-04-01-preview",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "administratorLogin": "[parameters('username')]",
-        "administratorLoginPassword": "[parameters('password')]"
-      }
-    },
-    {
-      "name": "[concat(variables('serverName'), '/', variables('databaseName'))]",
-      "type": "Microsoft.Sql/servers/databases",
-      "apiVersion": "2014-04-01-preview",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Sql/servers/', variables('serverName'))]"
-      ],
-      "properties": {
+	},
+	"resources": [{
+			"name": "[variables('serverName')]",
+			"type": "Microsoft.Sql/servers",
+			"apiVersion": "2014-04-01-preview",
+			"location": "[resourceGroup().location]",
+			"properties": {
+				"administratorLogin": "[parameters('username')]",
+				"administratorLoginPassword": "[parameters('password')]"
+			}
+		}, {
+			"name": "[concat(variables('serverName'), '/', variables('databaseName'))]",
+			"type": "Microsoft.Sql/servers/databases",
+			"apiVersion": "2014-04-01-preview",
+			"location": "[resourceGroup().location]",
+			"dependsOn": [
+				"[concat('Microsoft.Sql/servers/', variables('serverName'))]"
+			],
+			"properties": {
 
-        "edition": "[parameters('databaseEdition')]",
-        "collation": "[variables('databaseCollation')]",
-        "maxSizeBytes": "[variables('databasemaxSizeBytes')]",
-        "requestedServiceObjectiveName": "[parameters('databaseRequestedServiceObjectiveName')]"
-      }
-    },
-    {
-      "name": "[concat(variables('serverName'), '/AllowAllWindowsAzureIps')]",
-      "type": "Microsoft.Sql/servers/firewallrules",
-      "apiVersion": "2014-04-01-preview",
-      "dependsOn": [
-        "[concat('Microsoft.Sql/servers/', variables('serverName'))]"
-      ],
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "startIpAddress": "[parameters('startIP')]",
-        "endIpAddress": "[parameters('endIP')]"
-      }
-    }
-  ],
-  "outputs": {
-    "connectionString": {
-      "type": "string",
-      "value": "[concat('jdbc:sqlserver://', reference(concat('Microsoft.Sql/servers/', variables('serverName'))).fullyQualifiedDomainName, ':1433;database=', variables('databaseName'), ';user=', parameters('username'), '@', variables('serverName'), ';password=', parameters('password'), ';encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;')]"
-    },
-    "username": {
-      "type": "string",
-      "value": "[concat(parameters('username'), '@', variables('serverName'))]"
-    },
-    "password": {
-      "type": "string",
-      "value": "[concat(parameters('password'))]"
-    }
-  }
+				"edition": "[parameters('databaseEdition')]",
+				"collation": "[variables('databaseCollation')]",
+				"maxSizeBytes": "[variables('databasemaxSizeBytes')]",
+				"requestedServiceObjectiveName": "[parameters('databaseRequestedServiceObjectiveName')]"
+			}
+		}, {
+			"name": "[concat(variables('serverName'), '/AllowAllWindowsAzureIps')]",
+			"type": "Microsoft.Sql/servers/firewallrules",
+			"apiVersion": "2014-04-01-preview",
+			"dependsOn": [
+				"[concat('Microsoft.Sql/servers/', variables('serverName'))]"
+			],
+			"location": "[resourceGroup().location]",
+			"properties": {
+				"startIpAddress": "[parameters('startIP')]",
+				"endIpAddress": "[parameters('endIP')]"
+			}
+		}
+	],
+	"outputs": {
+		"connectionString": {
+			"type": "string",
+			"value": "[concat('jdbc:sqlserver://', reference(concat('Microsoft.Sql/servers/', variables('serverName'))).fullyQualifiedDomainName, ':1433;database=', variables('databaseName'), ';user=', parameters('username'), '@', variables('serverName'), ';password=', parameters('password'), ';encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;')]"
+		},
+		"username": {
+			"type": "string",
+			"value": "[concat(parameters('username'), '@', variables('serverName'))]"
+		},
+		"password": {
+			"type": "string",
+			"value": "[concat(parameters('password'))]"
+		}
+	}
 }
