@@ -1,0 +1,321 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "The Azure Region which should be targeted while provisioning the infrastructure described in this template."
+      }
+    },
+    "name": {
+      "type": "string",
+      "metadata": {
+        "description": "A unique name to identify the site, and its relate assets once it is created."
+      }
+    },
+    "imageName": {
+      "type": "string",
+      "metadata": {
+        "description": "The image which defines the application to be hosted in Azure."
+      }
+    },
+    "access": {
+      "type": "string",
+      "defaultValue": "private",
+      "allowedValues": [
+        "public",
+        "private"
+      ],
+      "metadata": {
+        "description": "Denotes whether the image selected lives in a public or private Docker registry."
+      }
+    },
+    "loginServer": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The url of the Docker registry which hosts the repository being used to host the image for your site."
+      }
+    },
+    "loginServerUsername": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The user handle used to authenticate against the private Docker registry, if applicable."
+      }
+    },
+    "loginServerPassword": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The password used to authenticate against the private Docker registry, if applicable."
+      }
+    },
+    "sqlConnectionString": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "sql connection string"
+      }
+    },
+    "sqlUsername": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": ""
+      }
+    },
+    "sqlPassword": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": ""
+      }
+    },
+    "alertEmails": {
+      "defaultValue": [ "martin.noskovic@accenture.com" ],
+      "type": "array"
+    }
+  },
+  "variables": {
+
+    //"appInsightsName": "[concat(parameters('name'))]",
+    //"appInsightsApiVersion": "2015-05-01",
+
+    "storageApiVersion": "2015-06-15",
+    "storageAccountName": "[concat(tolower(replace(parameters('name'),'-','')))]",
+    "storageAccountId": "[concat(resourceGroup().id,'/providers/Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+
+    "sonarqubeUrl": "[concat('https://', parameters('name'),'.azurewebsites.net')]",
+
+    "hostingPlanName": "[concat(parameters('name'))]",
+    "appSettingsPublicRegistry": [
+      {
+        "name": "SONARQUBE_JDBC_URL",
+        "value": "[parameters('sqlConnectionString')]"
+      },
+      {
+        "name": "SONARQUBE_JDBC_USERNAME",
+        "value": "[parameters('sqlUsername')]"
+      },
+      {
+        "name": "SONARQUBE_JDBC_PASSWORD",
+        "value": "[parameters('sqlPassword')]"
+      },
+      {
+        "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
+        "value": "false"
+      },
+      {
+        "name": "WEBSITES_PORT",
+        "value": "9000"
+      }
+    ],
+    "appSettingsPrivateRegistry": [
+      {
+        "name": "SONARQUBE_JDBC_URL",
+        "value": "[parameters('sqlConnectionString')]"
+      },
+      {
+        "name": "SONARQUBE_JDBC_USERNAME",
+        "value": "[parameters('sqlUsername')]"
+      },
+      {
+        "name": "SONARQUBE_JDBC_PASSWORD",
+        "value": "[parameters('sqlPassword')]"
+      },
+      {
+        "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
+        "value": "false"
+      },
+      {
+        "name": "DOCKER_REGISTRY_SERVER_URL",
+        "value": "[parameters('loginServer')]"
+      },
+      {
+        "name": "DOCKER_REGISTRY_SERVER_USERNAME",
+        "value": "[parameters('loginServerUsername')]"
+      },
+      {
+        "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
+        "value": "[parameters('loginServerPassword')]"
+      },
+      {
+        "name": "WEBSITES_PORT",
+        "value": "9000"
+      }
+    ]
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "sku": {
+        "Tier": "Standard",
+        "Name": "S1"
+      },
+      "kind": "linux",
+      "name": "[variables('hostingPlanName')]",
+      "apiVersion": "2016-09-01",
+      "location": "[parameters('location')]",
+      "properties": {
+        "name": "[variables('hostingPlanName')]",
+        "workerSizeId": "0",
+        "reserved": true,
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
+      }
+    },
+    {
+      "name": "[parameters('name')]",
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2018-02-01",
+      "location": "[parameters('location')]",
+      "tags": {
+      },
+      "properties": {
+        "name": "[parameters('name')]",
+        "siteConfig": {
+          "appSettings": "[if(equals(parameters('access'), 'private'), variables('appSettingsPrivateRegistry'), variables('appSettingsPublicRegistry'))]",
+          "appCommandLine": "",
+          "linuxFxVersion": "[concat('DOCKER|', parameters('imageName'))]"
+        },
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "hostingEnvironment": ""
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
+      ]
+    },
+    //{
+    //  "name": "[variables('appInsightsName')]",
+    //  "type": "Microsoft.Insights/components",
+    //  "kind": "web",
+    //  "location": "[parameters('location')]",
+    //  "apiVersion": "2015-05-01",
+    //  "tags": {
+    //    "displayName": "AppInsights"
+    //  },
+    //  "scale": null,
+    //  "properties": {
+    //    "Application_Type": "web"
+    //  },
+    //  "dependsOn": []
+    //},
+    //{
+    //  "name": "[concat(variables('appInsightsName'), '_server_exceptions')]",
+    //  "type": "microsoft.insights/alertrules",
+    //  "apiVersion": "2016-03-01",
+    //  "location": "[parameters('location')]",
+    //  "tags": {
+    //    "displayName": "application insights - server exceptions",
+    //    "[concat('hidden-link:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.insights/components/', variables('appInsightsName'))]": "Resource"
+    //  },
+    //  "properties": {
+    //    "name": "[concat(variables('appInsightsName'), '_server_exceptions')]",
+    //    "isEnabled": true,
+    //    "condition": {
+    //      "$type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.ThresholdRuleCondition, Microsoft.WindowsAzure.Management.Mon.Client",
+    //      "odata.type": "Microsoft.Azure.Management.Insights.Models.ThresholdRuleCondition",
+    //      "dataSource": {
+    //        "$type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.RuleMetricDataSource, Microsoft.WindowsAzure.Management.Mon.Client",
+    //        "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+    //        "resourceUri": "[resourceId('microsoft.insights/components', variables('appInsightsName'))]",
+    //        "resourceLocation": null,
+    //        "metricName": "basicExceptionServer.count",
+    //        "legacyResourceId": null
+    //      },
+    //      "operator": "GreaterThan",
+    //      "threshold": 0,
+    //      "windowSize": "PT5M"
+    //    },
+    //    "actions": [
+    //      {
+    //        "$type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.RuleEmailAction, Microsoft.WindowsAzure.Management.Mon.Client",
+    //        "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+    //        "sendToServiceOwners": false,
+    //        "customEmails": "[parameters('alertEmails')]"
+    //      }
+    //    ]
+    //  },
+    //  "resources": [],
+    //  "dependsOn": [
+    //    "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]"
+    //  ]
+    //},
+    {
+      "name": "[concat(variables('hostingPlanName'), '_max_cpu')]",
+      "type": "microsoft.insights/alertrules",
+      "apiVersion": "2016-03-01",
+      "location": "[parameters('location')]",
+      "tags": {
+      },
+      "scale": null,
+      "properties": {
+        "name": "[concat(variables('hostingPlanName'), '_max_cpu')]",
+        "isEnabled": true,
+        "condition": {
+          "odata.type": "Microsoft.Azure.Management.Insights.Models.ThresholdRuleCondition",
+          "dataSource": {
+            "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+            "resourceUri": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+            "metricNamespace": null,
+            "metricName": "CpuPercentage"
+          },
+          "operator": "GreaterThan",
+          "threshold": 80,
+          "windowSize": "PT5M"
+        },
+        "actions": [
+          {
+            "$type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.RuleEmailAction, Microsoft.WindowsAzure.Management.Mon.Client",
+            "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+            "sendToServiceOwners": false,
+            "customEmails": "[parameters('alertEmails')]"
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
+      ]
+    },
+    {
+      "name": "[concat(variables('hostingPlanName'), '_max_mem')]",
+      "type": "microsoft.insights/alertrules",
+      "apiVersion": "2016-03-01",
+      "location": "[parameters('location')]",
+      "tags": {
+      },
+      "scale": null,
+      "properties": {
+        "name": "[concat(variables('hostingPlanName'), '_max_mem')]",
+        "isEnabled": true,
+        "condition": {
+          "odata.type": "Microsoft.Azure.Management.Insights.Models.ThresholdRuleCondition",
+          "dataSource": {
+            "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+            "resourceUri": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+            "metricNamespace": null,
+            "metricName": "MemoryPercentage"
+          },
+          "operator": "GreaterThan",
+          "threshold": 80,
+          "windowSize": "PT5M"
+        },
+
+        "actions": [
+          {
+            "$type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.RuleEmailAction, Microsoft.WindowsAzure.Management.Mon.Client",
+            "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+            "sendToServiceOwners": false,
+            "customEmails": "[parameters('alertEmails')]"
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
+      ]
+    }
+  ]
+}
