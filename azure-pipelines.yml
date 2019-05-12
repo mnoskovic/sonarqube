@@ -6,8 +6,12 @@ variables:
   sonarqube-data-rg-name: 'sonarqube-data'
   sonarqube-rg-name: 'sonarqube'
   initial: true
+  location: 'westeurope'
 
 steps:
+
+
+
 - task: AzureResourceGroupDeployment@2
   displayName: database
   inputs:
