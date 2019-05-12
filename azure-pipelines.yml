@@ -1,0 +1,88 @@
+
+variables:
+  name: 'mnosq'
+  username: 'admin'
+  password: 
+  sonarqube-data-rg-name: 'sonarqube-data'
+  sonarqube-rg-name: 'sonarqube'
+  initial: true
+  location: 'westeurope'
+
+steps:
+
+
+
+- task: AzureResourceGroupDeployment@2
+  displayName: database
+  inputs:
+    azureSubscription: 'azure'
+    resourceGroupName: '$(sonarqube-data-rg-name)'
+    location: '$(location)'
+    csmFile: Sonarqube.Database/azuredeploy.json
+    csmParametersFile: Sonarqube.Database/azuredeploy.parameters.json
+    overrideParameters: '-name $(name) -username $(username) -password $(password)'
+    deploymentOutputs: database
+
+- task: AzureResourceGroupDeployment@2
+  displayName: registry
+  inputs:
+    azureSubscription: 'azure'
+    resourceGroupName: '$(sonarqube-rg-name)'
+    location: '$(location)'
+    csmFile: Sonarqube.Registry/azuredeploy.json
+    csmParametersFile: Sonarqube.Registry/azuredeploy.parameters.json
+    overrideParameters: '-name $(name)'
+    deploymentOutputs: registry
+
+- powershell: |
+   $d = ConvertFrom-Json '$(database)'
+   #$sqlConnectionString = $d.connectionString.value
+   
+   $sqlUsername = $d.username.value
+   $sqlPassword = $d.password.value
+   $sqlConnectionString = "jdbc:sqlserver://$(name).database.windows.net:1433;database=sonar;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;"
+   
+   Write-Output ("##vso[task.setvariable variable=sqlConnectionString;issecret=true]$sqlConnectionString")
+   Write-Output ("##vso[task.setvariable variable=sqlUsername;]$sqlUsername")
+   Write-Output ("##vso[task.setvariable variable=sqlPassword;issecret=true]$sqlPassword")
+   
+   $r = ConvertFrom-Json '$(registry)'
+   
+   $rLoginServer = $r.loginServer.value
+   $rUsername = $r.username.value
+   $rPassword = $r.password.value
+   
+   Write-Output ("##vso[task.setvariable variable=rLoginServer;]$rLoginServer")
+   Write-Output ("##vso[task.setvariable variable=rUsername;]$rUsername")
+   Write-Output ("##vso[task.setvariable variable=rPassword;issecret=true]$rPassword")
+ 
+  displayName: parameters
+
+- task: AzureCLI@1
+  displayName: 'build & publish'
+  inputs:
+    azureSubscription: 'azure'
+    scriptLocation: inlineScript
+    inlineScript: 'az acr build --registry $(name) --image $(imageName):$(version)-$(Build.BuildId) $(Build.SourcesDirectory) --build-arg SONAR_VERSION=$(version)'
+
+- task: AzureResourceGroupDeployment@2
+  displayName: 'sonarqube - create'
+  inputs:
+    azureSubscription: 'azure'
+    resourceGroupName: '$(sonarqube-rg-name)'
+    location: '$(location)'
+    csmFile: Sonarqube/azuredeploy.json
+    csmParametersFile: Sonarqube/azuredeploy.parameters.json
+    overrideParameters: '-name $(name) -loginServer https://$(rLoginServer) -loginServerUsername $(rUsername) -loginServerPassword $(rPassword) -imageName $(imageName):latest -sqlConnectionString $(sqlConnectionString) -sqlUsername $(sqlUsername) -sqlPassword $(password) -version $(version)'
+  condition: and(succeeded(), eq(variables['initial'], 'true'))
+
+- task: AzureRmWebAppDeployment@4
+  displayName: 'sonarqube - deploy'
+  inputs:
+    azureSubscription: 'azure'
+    appType: webAppContainer
+    WebAppName: mnobuild
+    DockerNamespace: '$(rLoginServer)'
+    DockerRepository: '$(imageName)'
+    DockerImageTag: '$(version)-$(Build.BuildId)'
+  condition: and(succeeded(), ne(variables['initial'], 'true'))
