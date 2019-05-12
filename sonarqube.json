@@ -228,7 +228,7 @@
 							"csmParametersFileLink": "",
 							"csmFile": "Sonarqube/azuredeploy.json",
 							"csmParametersFile": "Sonarqube/azuredeploy.parameters.json",
-							"overrideParameters": "-name $(name) -loginServer https://$(rLoginServer) -loginServerUsername $(rUsername) -loginServerPassword $(rPassword) -imageName $(image-name):latest -sqlConnectionString $(sqlConnectionString) -sqlUsername $(sqlUsername) -sqlPassword $(password) -version $(version)",
+							"overrideParameters": "-name $(name) -loginServer https://$(rLoginServer) -loginServerUsername $(rUsername) -loginServerPassword $(rPassword) -imageName $(image-name):latest -sqlConnectionString $(sqlConnectionString) -sqlUsername $(sqlUsername) -sqlPassword $(password)",
 							"deploymentMode": "Incremental",
 							"enableDeploymentPrerequisites": "None",
 							"deploymentGroupEndpoint": "",
