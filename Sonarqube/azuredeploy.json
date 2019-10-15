@@ -244,78 +244,78 @@
     //    "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]"
     //  ]
     //},
-    {
-      "name": "[concat(variables('hostingPlanName'), '_max_cpu')]",
-      "type": "microsoft.insights/alertrules",
-      "apiVersion": "2016-03-01",
-      "location": "[parameters('location')]",
-      "tags": {
-      },
-      "scale": null,
-      "properties": {
-        "name": "[concat(variables('hostingPlanName'), '_max_cpu')]",
-        "isEnabled": true,
-        "condition": {
-          "odata.type": "Microsoft.Azure.Management.Insights.Models.ThresholdRuleCondition",
-          "dataSource": {
-            "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
-            "resourceUri": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
-            "metricNamespace": null,
-            "metricName": "CpuPercentage"
-          },
-          "operator": "GreaterThan",
-          "threshold": 80,
-          "windowSize": "PT5M"
-        },
-        "actions": [
-          {
-            "$type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.RuleEmailAction, Microsoft.WindowsAzure.Management.Mon.Client",
-            "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
-            "sendToServiceOwners": false,
-            "customEmails": "[parameters('alertEmails')]"
-          }
-        ]
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
-      ]
-    },
-    {
-      "name": "[concat(variables('hostingPlanName'), '_max_mem')]",
-      "type": "microsoft.insights/alertrules",
-      "apiVersion": "2016-03-01",
-      "location": "[parameters('location')]",
-      "tags": {
-      },
-      "scale": null,
-      "properties": {
-        "name": "[concat(variables('hostingPlanName'), '_max_mem')]",
-        "isEnabled": true,
-        "condition": {
-          "odata.type": "Microsoft.Azure.Management.Insights.Models.ThresholdRuleCondition",
-          "dataSource": {
-            "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
-            "resourceUri": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
-            "metricNamespace": null,
-            "metricName": "MemoryPercentage"
-          },
-          "operator": "GreaterThan",
-          "threshold": 80,
-          "windowSize": "PT5M"
-        },
+    // {
+    //   "name": "[concat(variables('hostingPlanName'), '_max_cpu')]",
+    //   "type": "microsoft.insights/alertrules",
+    //   "apiVersion": "2016-03-01",
+    //   "location": "[parameters('location')]",
+    //   "tags": {
+    //   },
+    //   "scale": null,
+    //   "properties": {
+    //     "name": "[concat(variables('hostingPlanName'), '_max_cpu')]",
+    //     "isEnabled": true,
+    //     "condition": {
+    //       "odata.type": "Microsoft.Azure.Management.Insights.Models.ThresholdRuleCondition",
+    //       "dataSource": {
+    //         "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+    //         "resourceUri": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+    //         "metricNamespace": null,
+    //         "metricName": "CpuPercentage"
+    //       },
+    //       "operator": "GreaterThan",
+    //       "threshold": 80,
+    //       "windowSize": "PT5M"
+    //     },
+    //     "actions": [
+    //       {
+    //         "$type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.RuleEmailAction, Microsoft.WindowsAzure.Management.Mon.Client",
+    //         "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+    //         "sendToServiceOwners": false,
+    //         "customEmails": "[parameters('alertEmails')]"
+    //       }
+    //     ]
+    //   },
+    //   "dependsOn": [
+    //     "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
+    //   ]
+    // },
+    // {
+    //   "name": "[concat(variables('hostingPlanName'), '_max_mem')]",
+    //   "type": "microsoft.insights/alertrules",
+    //   "apiVersion": "2016-03-01",
+    //   "location": "[parameters('location')]",
+    //   "tags": {
+    //   },
+    //   "scale": null,
+    //   "properties": {
+    //     "name": "[concat(variables('hostingPlanName'), '_max_mem')]",
+    //     "isEnabled": true,
+    //     "condition": {
+    //       "odata.type": "Microsoft.Azure.Management.Insights.Models.ThresholdRuleCondition",
+    //       "dataSource": {
+    //         "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+    //         "resourceUri": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+    //         "metricNamespace": null,
+    //         "metricName": "MemoryPercentage"
+    //       },
+    //       "operator": "GreaterThan",
+    //       "threshold": 80,
+    //       "windowSize": "PT5M"
+    //     },
 
-        "actions": [
-          {
-            "$type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.RuleEmailAction, Microsoft.WindowsAzure.Management.Mon.Client",
-            "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
-            "sendToServiceOwners": false,
-            "customEmails": "[parameters('alertEmails')]"
-          }
-        ]
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
-      ]
-    }
+    //     "actions": [
+    //       {
+    //         "$type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.RuleEmailAction, Microsoft.WindowsAzure.Management.Mon.Client",
+    //         "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+    //         "sendToServiceOwners": false,
+    //         "customEmails": "[parameters('alertEmails')]"
+    //       }
+    //     ]
+    //   },
+    //   "dependsOn": [
+    //     "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
+    //   ]
+    // }
   ]
 }
