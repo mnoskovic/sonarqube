@@ -153,7 +153,7 @@
       "type": "Microsoft.Web/serverfarms",
       "sku": {
         "Tier": "Standard",
-        "Name": "S1"
+        "Name": "S2"
       },
       "kind": "linux",
       "name": "[variables('hostingPlanName')]",
