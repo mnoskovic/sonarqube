@@ -28,7 +28,7 @@
     },
     "repository": {
       "type": "string",
-      "defaultValue": "https://github.com/mnoskovic/SonarQube-AzureAppService.git"
+      "defaultValue": "https://coopitdevelopment@dev.azure.com/coopitdevelopment/Sonarqube/_git/Sonarqube-App"
     },
     "branch": {
       "type": "string",
