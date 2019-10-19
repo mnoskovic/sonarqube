@@ -22,7 +22,7 @@ namespace Sonarqube.Functions.App
             log.LogInformation("Sonarqube server - plugins clean");
 
             var url = Environment.GetEnvironmentVariable("SonarqubeUrl");
-            var token = Environment.GetEnvironmentVariable("SonarqubeToken");
+            var token = req.Headers["sonarqube-token"].FirstOrDefault() ?? Environment.GetEnvironmentVariable("SonarqubeToken");
 
             var plugins = await Sonarqube.PluginsUpdate(url, token);
             if (plugins.Any())
@@ -45,7 +45,8 @@ namespace Sonarqube.Functions.App
             log.LogInformation("Sonarqube server - plugins backup");
 
             var url = Environment.GetEnvironmentVariable("SonarqubeUrl");
-            var token = Environment.GetEnvironmentVariable("SonarqubeToken");
+            var token = req.Headers["sonarqube-token"].FirstOrDefault() ?? Environment.GetEnvironmentVariable("SonarqubeToken");
+
             var plugins = await Sonarqube.PluginsInstalled(url, token);
             var content = JsonConvert.SerializeObject(plugins);
 
@@ -67,7 +68,7 @@ namespace Sonarqube.Functions.App
             log.LogInformation("Sonarqube server - plugins restore");
 
             var url = Environment.GetEnvironmentVariable("SonarqubeUrl");
-            var token = Environment.GetEnvironmentVariable("SonarqubeToken");
+            var token = req.Headers["sonarqube-token"].FirstOrDefault() ?? Environment.GetEnvironmentVariable("SonarqubeToken");
 
             var existingPlugins = await Sonarqube.PluginsInstalled(url, token);
 
@@ -96,7 +97,7 @@ namespace Sonarqube.Functions.App
             log.LogInformation("Sonarqube server - restarting");
 
             var url = Environment.GetEnvironmentVariable("SonarqubeUrl");
-            var token = Environment.GetEnvironmentVariable("SonarqubeToken");
+            var token = req.Headers["sonarqube-token"].FirstOrDefault() ?? Environment.GetEnvironmentVariable("SonarqubeToken");
 
             await Sonarqube.Restart(url, token);
 
