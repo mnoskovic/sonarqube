@@ -33,6 +33,15 @@
     "branch": {
       "type": "string",
       "defaultValue": "master"
+    },
+    "sqlConnectionString": {
+      "type": "string"
+    },
+    "sqlUsername": {
+      "type": "string"
+    },
+    "sqlPassword": {
+      "type": "string"
     }
   },
   "variables": {
@@ -266,7 +275,11 @@
             "ApplicationInsights.InstrumentationKey": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), variables('appInsightsApiVersion')).InstrumentationKey]",
             "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), variables('appInsightsApiVersion')).InstrumentationKey]",
 
-            "StorageConnectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', concat(listKeys(variables('storageAccountId'), variables('storageApiVersion')).key1))]"
+            "StorageConnectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', concat(listKeys(variables('storageAccountId'), variables('storageApiVersion')).key1))]",
+
+            "sonar.jdbc.url": "[parameters('sqlConnectionString')]",
+            "sonar.jdbc.username": "[parameters('sqlUsername')]",
+            "sonar.jdbc.password": "[parameters('sqlPassword')]"
           }
         },
         {
