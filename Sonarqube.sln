@@ -5,23 +5,11 @@ VisualStudioVersion = 15.0.28010.2041
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "Sonarqube.Database", "Sonarqube.Database\Sonarqube.Database.deployproj", "{057A14AE-1830-49CC-B696-AEE313504F82}"
 EndProject
-Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "Sonarqube.Registry", "Sonarqube.Registry\Sonarqube.Registry.deployproj", "{C5BDCD8D-69C2-458C-80C1-CAA366BE9E72}"
-EndProject
 Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "Sonarqube", "Sonarqube\Sonarqube.deployproj", "{8864C73D-A07E-49AC-859E-12AE8277982C}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Definition", "Definition", "{0E94D443-D58F-483B-B032-8F118FCEC9C6}"
-	ProjectSection(SolutionItems) = preProject
-		Dockerfile = Dockerfile
-		plugins-pull.ps1 = plugins-pull.ps1
-		plugins-push.ps1 = plugins-push.ps1
-		run.sh = run.sh
-	EndProjectSection
 EndProject
 Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "Empty", "Empty\Empty.deployproj", "{CC20C8C2-721A-467B-BAFD-B50DD7A56BDE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sonarqube.Functions", "Sonarqube.Functions\Sonarqube.Functions.csproj", "{F82F9AD3-8C2F-4A87-9780-F96D718D588E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sonarqube.App", "Sonarqube.App\Sonarqube.App.csproj", "{78CBDCEA-B96A-4A9C-83ED-2FAFEDF319C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,10 +21,6 @@ Global
 		{057A14AE-1830-49CC-B696-AEE313504F82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{057A14AE-1830-49CC-B696-AEE313504F82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{057A14AE-1830-49CC-B696-AEE313504F82}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C5BDCD8D-69C2-458C-80C1-CAA366BE9E72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C5BDCD8D-69C2-458C-80C1-CAA366BE9E72}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C5BDCD8D-69C2-458C-80C1-CAA366BE9E72}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C5BDCD8D-69C2-458C-80C1-CAA366BE9E72}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8864C73D-A07E-49AC-859E-12AE8277982C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8864C73D-A07E-49AC-859E-12AE8277982C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8864C73D-A07E-49AC-859E-12AE8277982C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -49,10 +33,6 @@ Global
 		{F82F9AD3-8C2F-4A87-9780-F96D718D588E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F82F9AD3-8C2F-4A87-9780-F96D718D588E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F82F9AD3-8C2F-4A87-9780-F96D718D588E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{78CBDCEA-B96A-4A9C-83ED-2FAFEDF319C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{78CBDCEA-B96A-4A9C-83ED-2FAFEDF319C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{78CBDCEA-B96A-4A9C-83ED-2FAFEDF319C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{78CBDCEA-B96A-4A9C-83ED-2FAFEDF319C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

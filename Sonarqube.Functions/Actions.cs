@@ -78,7 +78,7 @@ namespace Sonarqube.Functions
                 if (missingPlugins.Any())
                 {
 
-                    log.LogInformation($"Restoring sonarqube plugins: {String.Join(, missingPlugins)}");
+                    log.LogInformation($"Restoring sonarqube plugins: {string.Join(",", missingPlugins)}");
 
                     await Sonarqube.InstallPlugins(url, token, missingPlugins);
                     await Sonarqube.Restart(url, token);
