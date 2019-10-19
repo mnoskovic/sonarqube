@@ -16,7 +16,7 @@ namespace Sonarqube.Functions.App
     {
 
         [FunctionName("install-plugins")]
-        public static async Task<IActionResult> Restore(
+        public static async Task<IActionResult> Install(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
