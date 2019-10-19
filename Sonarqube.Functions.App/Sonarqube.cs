@@ -10,11 +10,21 @@ namespace Sonarqube.Functions.App
 {
     public static class Sonarqube
     {
-        public static async Task<IEnumerable<string>> GetPlugins(string url, string token)
+        public static async Task<IEnumerable<string>> PluginsInstalled(string url, string token)
+        {
+            return await Get($"{url}/api/plugins/installed", token);
+        }
+
+        public static async Task<IEnumerable<string>> PluginsUpdate(string url, string token)
+        {
+            return await Get($"{url}/api/plugins/update", token);
+        }
+
+        public static async Task<IEnumerable<string>> Get(string url, string token)
         {
             var request = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{url}/api/plugins/installed"),
+                RequestUri = new Uri(url),
                 Method = HttpMethod.Get,
             };
 
@@ -26,10 +36,7 @@ namespace Sonarqube.Functions.App
                 var response = await client.SendAsync(request);
                 var content = await response.Content.ReadAsStringAsync();
 
-                if (response.StatusCode != System.Net.HttpStatusCode.OK)
-                {
-                    throw new Exception($"Status code: {response.StatusCode}, Content: {content}");
-                }
+                response.EnsureSuccessStatusCode();
 
                 return JObject.Parse(content)
                     .Value<JArray>("plugins")
@@ -37,7 +44,6 @@ namespace Sonarqube.Functions.App
                     .ToArray();
             }
         }
-
         public static async Task InstallPlugins(string url, string token, IEnumerable<string> plugins)
         {
             var tasks = new List<Task>();
@@ -67,51 +73,48 @@ namespace Sonarqube.Functions.App
             using (var client = new HttpClient())
             {
                 var response = await client.SendAsync(request);
-                var content = await response.Content.ReadAsStringAsync();
-
-                if (response.StatusCode != System.Net.HttpStatusCode.NoContent)
-                {
-                    throw new Exception($"Status code: {response.StatusCode}, Content: {content}");
-                }
+                response.EnsureSuccessStatusCode();
             }
         }
 
 
-        //public static async Task UninstallPlugins(string url, string token, IEnumerable<string> plugins)
-        //{
-        //    var tasks = new List<Task>();
-        //    foreach (var plugin in plugins)
-        //    {
-        //        tasks.Add(UninstallPlugin(url, token, plugin));
-        //    }
-        //    await Task.WhenAll(tasks.ToArray());
-        //}
+        public static async Task UpdatePlugins(string url, string token, IEnumerable<string> plugins)
+        {
+            var tasks = new List<Task>();
+            foreach (var plugin in plugins)
+            {
+                tasks.Add(UpdatePlugin(url, token, plugin));
+            }
+            await Task.WhenAll(tasks.ToArray());
+        }
 
-        //public static async Task UninstallPlugin(string url, string token, string key)
-        //{
+        public static async Task UpdatePlugin(string url, string token, string key)
+        {
+            await PluginAction($"{url}/api/plugins/update", token, key);
+        }
 
-        //    var request = new HttpRequestMessage
-        //    {
-        //        RequestUri = new Uri($"{url}/api/plugins/uninstall"),
-        //        Method = HttpMethod.Post,
-        //    };
+        public static async Task PluginAction(string url, string token, string key)
+        {
 
-        //    var base64 = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{token}:"));
-        //    request.Headers.Add("Authorization", $"Basic {base64}");
+            var request = new HttpRequestMessage
+            {
+                RequestUri = new Uri(url),
+                Method = HttpMethod.Post,
+            };
 
-        //    request.Content = new StringContent($"key={key}", Encoding.UTF8, "application/x-www-form-urlencoded");
+            var base64 = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{token}:"));
+            request.Headers.Add("Authorization", $"Basic {base64}");
 
-        //    using (var client = new HttpClient())
-        //    {
-        //        var response = await client.SendAsync(request);
-        //        var content = await response.Content.ReadAsStringAsync();
+            request.Content = new StringContent($"key={key}", Encoding.UTF8, "application/x-www-form-urlencoded");
 
-        //        if (response.StatusCode != System.Net.HttpStatusCode.NoContent)
-        //        {
-        //            throw new Exception($"Status code: {response.StatusCode}, Content: {content}");
-        //        }
-        //    }
-        //}
+            using (var client = new HttpClient())
+            {
+                var response = await client.SendAsync(request);
+                var content = await response.Content.ReadAsStringAsync();
+
+                response.EnsureSuccessStatusCode();
+            }
+        }
 
         public static async Task Restart(string url, string token)
         {
@@ -130,10 +133,7 @@ namespace Sonarqube.Functions.App
                 var response = await client.SendAsync(request);
                 var content = await response.Content.ReadAsStringAsync();
 
-                if (response.StatusCode != System.Net.HttpStatusCode.OK)
-                {
-                    throw new Exception($"Status code: {response.StatusCode}, Content: {content}");
-                }
+                response.EnsureSuccessStatusCode();
             }
         }
     }

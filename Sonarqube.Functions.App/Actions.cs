@@ -8,31 +8,32 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Sonarqube.Functions.App
 {
     public static class Actions
     {
-        private static readonly HttpClient HttpClient = new HttpClient();
+        [FunctionName("update-plugins")]
+        public static async Task<IActionResult> Update(
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
+            ILogger log)
+        {
+            log.LogInformation("Sonarqube server - plugins clean");
 
-        //[FunctionName("clean-plugins")]
-        //public static async Task<IActionResult> Clean(
-        //    [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
-        //    ILogger log)
-        //{
-        //    log.LogInformation("Sonarqube server - plugins clean");
+            var url = Environment.GetEnvironmentVariable("SonarqubeUrl");
+            var token = Environment.GetEnvironmentVariable("SonarqubeToken");
 
-        //    var url = Environment.GetEnvironmentVariable("SonarqubeUrl");
-        //    var token = Environment.GetEnvironmentVariable("SonarqubeToken");
+            var plugins = await Sonarqube.PluginsUpdate(url, token);
+            if (plugins.Any())
+            {
+                log.LogInformation($"Updating plugins: {string.Join(",", plugins)}");
 
-        //    var plugins = await Sonarqube.GetPlugins(url, token);
-        //    await Sonarqube.UninstallPlugins(url, token, plugins);
-        //    await Sonarqube.Restart(url, token);
-
-        //    return new OkObjectResult(null);
-        //}
+                await Sonarqube.UpdatePlugins(url, token, plugins);
+                await Sonarqube.Restart(url, token);
+            }
+            return new OkObjectResult(null);
+        }
 
 
         [FunctionName("backup-plugins")]
@@ -45,7 +46,7 @@ namespace Sonarqube.Functions.App
 
             var url = Environment.GetEnvironmentVariable("SonarqubeUrl");
             var token = Environment.GetEnvironmentVariable("SonarqubeToken");
-            var plugins = await Sonarqube.GetPlugins(url, token);
+            var plugins = await Sonarqube.PluginsInstalled(url, token);
             var content = JsonConvert.SerializeObject(plugins);
 
             using (var writer = new StreamWriter(stream))
@@ -68,7 +69,7 @@ namespace Sonarqube.Functions.App
             var url = Environment.GetEnvironmentVariable("SonarqubeUrl");
             var token = Environment.GetEnvironmentVariable("SonarqubeToken");
 
-            var existingPlugins = await Sonarqube.GetPlugins(url, token);
+            var existingPlugins = await Sonarqube.PluginsInstalled(url, token);
 
             using (var reader = new StreamReader(stream))
             {
@@ -77,7 +78,6 @@ namespace Sonarqube.Functions.App
                 var missingPlugins = requiredPlugins.Except(existingPlugins);
                 if (missingPlugins.Any())
                 {
-
                     log.LogInformation($"Restoring sonarqube plugins: {string.Join(",", missingPlugins)}");
 
                     await Sonarqube.InstallPlugins(url, token, missingPlugins);
