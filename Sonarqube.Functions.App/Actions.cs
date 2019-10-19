@@ -14,6 +14,36 @@ namespace Sonarqube.Functions.App
 {
     public static class Actions
     {
+
+        [FunctionName("install-plugins")]
+        public static async Task<IActionResult> Restore(
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
+            ILogger log)
+        {
+            log.LogInformation("Sonarqube server - plugins restore");
+
+            var url = Environment.GetEnvironmentVariable("SonarqubeUrl");
+            var token = req.Headers["sonarqube-token"].FirstOrDefault() ?? Environment.GetEnvironmentVariable("SonarqubeToken");
+
+            var existingPlugins = await Sonarqube.PluginsInstalled(url, token);
+            
+            using (var reader = new StreamReader(req.Body))
+            {
+                var content = await reader.ReadToEndAsync();
+                var requiredPlugins = JArray.Parse(content).Select(i => i.Value<string>());
+                var missingPlugins = requiredPlugins.Except(existingPlugins);
+                if (missingPlugins.Any())
+                {
+                    log.LogInformation($"Installing sonarqube plugins: {string.Join(",", missingPlugins)}");
+
+                    await Sonarqube.InstallPlugins(url, token, missingPlugins);
+                    await Sonarqube.Restart(url, token);
+                }
+            }
+
+            return new OkObjectResult(null);
+        }
+        
         [FunctionName("update-plugins")]
         public static async Task<IActionResult> Update(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
@@ -56,9 +86,7 @@ namespace Sonarqube.Functions.App
             }
             return new OkObjectResult(content);
         }
-
-
-
+        
         [FunctionName("restore-plugins")]
         public static async Task<IActionResult> Restore(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
