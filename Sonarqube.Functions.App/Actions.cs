@@ -69,7 +69,7 @@ namespace Sonarqube.Functions.App
         [FunctionName("backup-plugins")]
         public static async Task<IActionResult> Backup(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
-            [Blob("sonarqube/plugins", FileAccess.Write, Connection = "StorageConnection")] Stream stream,
+            [Blob("sonarqube/plugins", FileAccess.Write, Connection = "StorageConnectionString")] Stream stream,
             ILogger log)
         {
             log.LogInformation("Sonarqube server - plugins backup");
@@ -90,7 +90,7 @@ namespace Sonarqube.Functions.App
         [FunctionName("restore-plugins")]
         public static async Task<IActionResult> Restore(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
-            [Blob("sonarqube/plugins", FileAccess.Read, Connection = "StorageConnection")] Stream stream,
+            [Blob("sonarqube/plugins", FileAccess.Read, Connection = "StorageConnectionString")] Stream stream,
             ILogger log)
         {
             log.LogInformation("Sonarqube server - plugins restore");
