@@ -132,7 +132,6 @@
       "properties": {
         "name": "[variables('functionAppPlanName')]"
       },
-<<<<<<< HEAD
       "dependsOn": []
     },
     {
@@ -189,9 +188,11 @@
 
             "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', concat(listKeys(variables('storageAccountId'), variables('storageApiVersion')).key1))]",
             "WEBSITE_CONTENTSHARE": "[variables('storageAccountName')]",
-            "WEBSITE_RUN_FROM_PACKAGE": "1"          }
-        },
+            "WEBSITE_RUN_FROM_PACKAGE": "1",
 
+            "SonarqubeUrl": "[concat('https://',variables('webAppName'),'azurewebsites.net')]"
+          }
+        },
         {
           "name": "connectionstrings",
           "type": "config",
