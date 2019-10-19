@@ -4,35 +4,35 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Sonarqube.Functions
+namespace Sonarqube.Functions.App
 {
     public static class Actions
     {
         private static readonly HttpClient HttpClient = new HttpClient();
 
-        [FunctionName("clean-plugins")]
-        public static async Task<IActionResult> Clean(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
-            ILogger log)
-        {
-            log.LogInformation("Sonarqube server - plugins clean");
+        //[FunctionName("clean-plugins")]
+        //public static async Task<IActionResult> Clean(
+        //    [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
+        //    ILogger log)
+        //{
+        //    log.LogInformation("Sonarqube server - plugins clean");
 
-            var url = Environment.GetEnvironmentVariable("SonarqubeUrl");
-            var token = Environment.GetEnvironmentVariable("SonarqubeToken");
+        //    var url = Environment.GetEnvironmentVariable("SonarqubeUrl");
+        //    var token = Environment.GetEnvironmentVariable("SonarqubeToken");
 
-            var plugins = await Sonarqube.GetPlugins(url, token);
-            await Sonarqube.UninstallPlugins(url, token, plugins);
-            await Sonarqube.Restart(url, token);
+        //    var plugins = await Sonarqube.GetPlugins(url, token);
+        //    await Sonarqube.UninstallPlugins(url, token, plugins);
+        //    await Sonarqube.Restart(url, token);
 
-            return new OkObjectResult(null);
-        }
+        //    return new OkObjectResult(null);
+        //}
 
 
         [FunctionName("backup-plugins")]
@@ -73,7 +73,7 @@ namespace Sonarqube.Functions
             using (var reader = new StreamReader(stream))
             {
                 var content = await reader.ReadToEndAsync();
-                var requiredPlugins = (IEnumerable<string>)JsonConvert.DeserializeObject(content);
+                var requiredPlugins = JArray.Parse(content).Select(i => i.Value<string>());
                 var missingPlugins = requiredPlugins.Except(existingPlugins);
                 if (missingPlugins.Any())
                 {

@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sonarqube.Functions
+namespace Sonarqube.Functions.App
 {
     public static class Sonarqube
     {
@@ -54,19 +54,22 @@ namespace Sonarqube.Functions
 
             var request = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{url}/api/plugins/install?key={key}"),
+                RequestUri = new Uri($"{url}/api/plugins/install"),
                 Method = HttpMethod.Post,
             };
 
             var base64 = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{token}:"));
             request.Headers.Add("Authorization", $"Basic {base64}");
 
+            request.Content = new StringContent($"key={key}", Encoding.UTF8, "application/x-www-form-urlencoded");
+
+
             using (var client = new HttpClient())
             {
                 var response = await client.SendAsync(request);
                 var content = await response.Content.ReadAsStringAsync();
 
-                if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                if (response.StatusCode != System.Net.HttpStatusCode.NoContent)
                 {
                     throw new Exception($"Status code: {response.StatusCode}, Content: {content}");
                 }
@@ -74,39 +77,41 @@ namespace Sonarqube.Functions
         }
 
 
-        public static async Task UninstallPlugins(string url, string token, IEnumerable<string> plugins)
-        {
-            var tasks = new List<Task>();
-            foreach (var plugin in plugins)
-            {
-                tasks.Add(UninstallPlugin(url, token, plugin));
-            }
-            await Task.WhenAll(tasks.ToArray());
-        }
+        //public static async Task UninstallPlugins(string url, string token, IEnumerable<string> plugins)
+        //{
+        //    var tasks = new List<Task>();
+        //    foreach (var plugin in plugins)
+        //    {
+        //        tasks.Add(UninstallPlugin(url, token, plugin));
+        //    }
+        //    await Task.WhenAll(tasks.ToArray());
+        //}
 
-        public static async Task UninstallPlugin(string url, string token, string key)
-        {
+        //public static async Task UninstallPlugin(string url, string token, string key)
+        //{
 
-            var request = new HttpRequestMessage
-            {
-                RequestUri = new Uri($"{url}/api/plugins/uninstall?key={key}"),
-                Method = HttpMethod.Post,
-            };
+        //    var request = new HttpRequestMessage
+        //    {
+        //        RequestUri = new Uri($"{url}/api/plugins/uninstall"),
+        //        Method = HttpMethod.Post,
+        //    };
 
-            var base64 = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{token}:"));
-            request.Headers.Add("Authorization", $"Basic {base64}");
+        //    var base64 = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{token}:"));
+        //    request.Headers.Add("Authorization", $"Basic {base64}");
 
-            using (var client = new HttpClient())
-            {
-                var response = await client.SendAsync(request);
-                var content = await response.Content.ReadAsStringAsync();
+        //    request.Content = new StringContent($"key={key}", Encoding.UTF8, "application/x-www-form-urlencoded");
 
-                if (response.StatusCode != System.Net.HttpStatusCode.OK)
-                {
-                    throw new Exception($"Status code: {response.StatusCode}, Content: {content}");
-                }
-            }
-        }
+        //    using (var client = new HttpClient())
+        //    {
+        //        var response = await client.SendAsync(request);
+        //        var content = await response.Content.ReadAsStringAsync();
+
+        //        if (response.StatusCode != System.Net.HttpStatusCode.NoContent)
+        //        {
+        //            throw new Exception($"Status code: {response.StatusCode}, Content: {content}");
+        //        }
+        //    }
+        //}
 
         public static async Task Restart(string url, string token)
         {
