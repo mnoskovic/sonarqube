@@ -7,7 +7,7 @@
       "minLength": 1
     },
     "skuName": {
-      "defaultValue": "B2",
+      "defaultValue": "S2",
       "allowedValues": [
         "B1",
         "B2",
