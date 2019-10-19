@@ -132,6 +132,7 @@
       "properties": {
         "name": "[variables('functionAppPlanName')]"
       },
+<<<<<<< HEAD
       "dependsOn": []
     },
     {
