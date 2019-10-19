@@ -105,6 +105,7 @@
             "[resourceId('Microsoft.Web/sites', variables('webAppName'))]"
           ],
           "properties": {
+            "httpsOnly": true,
             "alwaysOn": false,
             "javaVersion": "11",
             "javaContainer": "TOMCAT",

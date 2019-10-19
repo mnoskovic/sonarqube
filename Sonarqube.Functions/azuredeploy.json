@@ -123,6 +123,7 @@
             "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
           ],
           "properties": {
+            "httpsOnly": true,
             "phpVersion": "Off",
             "alwaysOn": false,
             "webSocketsEnabled": false
