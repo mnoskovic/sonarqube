@@ -34,7 +34,7 @@
 		},
 		"databaseRequestedServiceObjectiveName": {
 			"type": "string",
-			"defaultValue": "S0",
+			"defaultValue": "S1",
 			"allowedValues": [
 				"Basic",
 				"S0",
