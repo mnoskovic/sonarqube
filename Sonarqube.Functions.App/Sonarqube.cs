@@ -57,26 +57,8 @@ namespace Sonarqube.Functions.App
 
         public static async Task InstallPlugin(string url, string token, string key)
         {
-
-            var request = new HttpRequestMessage
-            {
-                RequestUri = new Uri($"{url}/api/plugins/install"),
-                Method = HttpMethod.Post,
-            };
-
-            var base64 = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{token}:"));
-            request.Headers.Add("Authorization", $"Basic {base64}");
-
-            request.Content = new StringContent($"key={key}", Encoding.UTF8, "application/x-www-form-urlencoded");
-
-
-            using (var client = new HttpClient())
-            {
-                var response = await client.SendAsync(request);
-                response.EnsureSuccessStatusCode();
-            }
+            await Action($"{url}/api/plugins/install", token, key);
         }
-
 
         public static async Task UpdatePlugins(string url, string token, IEnumerable<string> plugins)
         {
@@ -90,10 +72,10 @@ namespace Sonarqube.Functions.App
 
         public static async Task UpdatePlugin(string url, string token, string key)
         {
-            await PluginAction($"{url}/api/plugins/update", token, key);
+            await Action($"{url}/api/plugins/update", token, key);
         }
 
-        public static async Task PluginAction(string url, string token, string key)
+        public static async Task Action(string url, string token, string key)
         {
 
             var request = new HttpRequestMessage
