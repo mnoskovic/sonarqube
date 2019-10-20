@@ -122,11 +122,11 @@
           ],
           "properties": {
             "ApplicationInsights.InstrumentationKey": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), variables('appInsightsApiVersion')).InstrumentationKey]",
-            "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), variables('appInsightsApiVersion')).InstrumentationKey]",
+            "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), variables('appInsightsApiVersion')).InstrumentationKey]"
 
-            "sonar.jdbc.url": "[parameters('sqlConnectionString')]",
-            "sonar.jdbc.username": "[parameters('sqlUsername')]",
-            "sonar.jdbc.password": "[parameters('sqlPassword')]"
+            //"sonar.jdbc.url": "[parameters('sqlConnectionString')]",
+            //"sonar.jdbc.username": "[parameters('sqlUsername')]",
+            //"sonar.jdbc.password": "[parameters('sqlPassword')]"
           }
         },
         {
