@@ -140,7 +140,9 @@
           "properties": {
             "RepoUrl": "[parameters('repository')]",
             "branch": "[parameters('branch')]",
-            "IsManualIntegration": true
+            "isManualIntegration": false,
+            "deploymentRollbackEnabled": false,
+            "isMercurial": false
           }
         }
       ]
