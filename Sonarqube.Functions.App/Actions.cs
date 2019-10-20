@@ -17,7 +17,7 @@ namespace Sonarqube.Functions.App
 
         [FunctionName("install-plugins")]
         public static async Task<IActionResult> Install(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
             log.LogInformation("Sonarqube server - plugins restore");
@@ -46,7 +46,7 @@ namespace Sonarqube.Functions.App
         
         [FunctionName("update-plugins")]
         public static async Task<IActionResult> Update(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
             log.LogInformation("Sonarqube server - plugins clean");
@@ -68,7 +68,7 @@ namespace Sonarqube.Functions.App
 
         [FunctionName("backup-plugins")]
         public static async Task<IActionResult> Backup(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             [Blob("sonarqube/plugins", FileAccess.Write, Connection = "StorageConnectionString")] Stream stream,
             ILogger log)
         {
@@ -89,7 +89,7 @@ namespace Sonarqube.Functions.App
         
         [FunctionName("restore-plugins")]
         public static async Task<IActionResult> Restore(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             [Blob("sonarqube/plugins", FileAccess.Read, Connection = "StorageConnectionString")] Stream stream,
             ILogger log)
         {
@@ -119,7 +119,7 @@ namespace Sonarqube.Functions.App
 
         [FunctionName("restart-server")]
         public static async Task<IActionResult> Restart(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
             log.LogInformation("Sonarqube server - restarting");
