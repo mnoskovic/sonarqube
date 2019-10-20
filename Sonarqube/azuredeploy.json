@@ -42,6 +42,10 @@
     },
     "sqlPassword": {
       "type": "string"
+    },
+    "version":{
+      "type": "string",
+      "defaultValue": ""
     }
   },
   "variables": {
@@ -126,7 +130,9 @@
 
             "sonar.jdbc.url": "[parameters('sqlConnectionString')]",
             "sonar.jdbc.username": "[parameters('sqlUsername')]",
-            "sonar.jdbc.password": "[parameters('sqlPassword')]"
+            "sonar.jdbc.password": "[parameters('sqlPassword')]",
+        
+            "VERSION": "[parameters('version')]"
           }
         },
         {
