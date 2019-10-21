@@ -156,7 +156,7 @@
             "WEBSITE_CONTENTSHARE": "[variables('storageAccountName')]",
             "WEBSITE_RUN_FROM_PACKAGE": "1",
 
-            "SonarqubeUrl": "[concat('https://',variables('webAppName'),'azurewebsites.net')]"
+            "SonarqubeUrl": "[concat('https://',variables('webAppName'),'.azurewebsites.net')]"
           }
         },
         {

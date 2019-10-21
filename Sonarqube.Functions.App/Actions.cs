@@ -26,7 +26,7 @@ namespace Sonarqube.Functions.App
             var token = req.Headers["sonarqube-token"].FirstOrDefault() ?? Environment.GetEnvironmentVariable("SonarqubeToken");
 
             var existingPlugins = await Sonarqube.PluginsInstalled(url, token);
-            
+
             using (var reader = new StreamReader(req.Body))
             {
                 var content = await reader.ReadToEndAsync();
@@ -43,7 +43,7 @@ namespace Sonarqube.Functions.App
 
             return new OkObjectResult(null);
         }
-        
+
         [FunctionName("update-plugins")]
         public static async Task<IActionResult> Update(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
@@ -69,7 +69,9 @@ namespace Sonarqube.Functions.App
         [FunctionName("backup-plugins")]
         public static async Task<IActionResult> Backup(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
-            [Blob("sonarqube/plugins", FileAccess.Write, Connection = "StorageConnectionString")] Stream stream,
+            [Blob("sonarqube/plugins", FileAccess.Write, Connection = "StorageConnectionString")] TextWriter writer,
+            [Blob("sonarqube/plugins-{DateTime}", FileAccess.Write, Connection = "StorageConnectionString")] TextWriter logWriter,
+
             ILogger log)
         {
             log.LogInformation("Sonarqube server - plugins backup");
@@ -80,13 +82,11 @@ namespace Sonarqube.Functions.App
             var plugins = await Sonarqube.PluginsInstalled(url, token);
             var content = JsonConvert.SerializeObject(plugins);
 
-            using (var writer = new StreamWriter(stream))
-            {
-                await writer.WriteAsync(content);
-            }
+            await writer.WriteAsync(content);
+            await logWriter.WriteAsync(content);
             return new OkObjectResult(content);
         }
-        
+
         [FunctionName("restore-plugins")]
         public static async Task<IActionResult> Restore(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
